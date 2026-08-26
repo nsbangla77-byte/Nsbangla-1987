@@ -5,147 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Probashi Moncho Foundation</title>
     
-    <!-- CSS এবং আইকন লাইব্রেরি -->
+    <!-- আইকন এবং সিএসএস -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        body { background-color: #f3f4f6; font-family: 'Segoe UI', sans-serif; }
-        .app-card { max-width: 480px; margin: auto; background: white; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        .link-btn { transition: 0.3s; display: flex; align-items: center; background: #ffffff; border: 1px solid #e5e7eb; padding: 16px; margin-bottom: 12px; border-radius: 16px; text-decoration: none; color: #374151; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .link-btn:hover { border-color: #2563eb; transform: translateY(-2px); background-color: #f8fafc; }
-        .admin-panel { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 25px; border-top: 4px solid #2563eb; border-radius: 30px 30px 0 0; box-shadow: 0 -10px 25px rgba(0,0,0,0.1); z-index: 100; max-width: 480px; margin: auto; }
+        body { background-color: #f0f4f8; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .app-container { max-width: 480px; margin: auto; background: white; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .header { background: #1e40af; padding: 40px 20px; text-align: center; color: white; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; }
+        .link-btn { display: flex; align-items: center; background: white; border: 1px solid #e5e7eb; padding: 18px; margin: 15px; border-radius: 18px; text-decoration: none; color: #374151; font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: 0.3s; }
+        .link-btn:hover { border-color: #3b82f6; transform: translateY(-2px); }
+        .admin-panel { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 25px; border-top: 5px solid #1e40af; border-radius: 30px 30px 0 0; z-index: 100; max-width: 480px; margin: auto; box-shadow: 0 -10px 25px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
-<div class="app-card">
-    <!-- উপরের ব্যানার অংশ -->
-    <div class="bg-blue-600 p-10 text-center text-white rounded-b-[45px] shadow-lg mb-10">
-        <div class="w-24 h-24 bg-white rounded-full mx-auto mb-5 flex items-center justify-center text-blue-600 text-4xl shadow-inner border-4 border-blue-400">
-            <i class="fas fa-users"></i>
+<div class="app-container">
+    <!-- Header -->
+    <div class="header shadow-xl">
+        <div class="w-24 h-24 bg-white rounded-full mx-auto mb-5 flex items-center justify-center text-blue-700 text-4xl shadow-inner border-4 border-blue-300">
+            <i class="fas fa-hand-holding-heart"></i>
         </div>
-        <h1 id="display-title" class="text-xl font-bold uppercase leading-tight">BANGLADESH PROBASHI MONCHO FOUNDATION</h1>
-        <p class="text-blue-100 text-xs mt-2 opacity-90 tracking-widest">সব গুরুত্বপূর্ণ লিঙ্ক ও তথ্য এখানে</p>
+        <h1 id="main-title" class="text-xl font-bold uppercase leading-tight">BANGLADESH PROBASHI MONCHO FOUNDATION</h1>
+        <p class="text-blue-100 text-xs mt-2 font-medium tracking-wide">সেবার তরে প্রবাসীদের তরে</p>
     </div>
 
-    <!-- লিঙ্ক লিস্ট প্রদর্শন -->
-    <div id="links-display" class="px-6 pb-24">
-        <!-- এখানে আপনার বাটনগুলো অটোমেটিক চলে আসবে -->
+    <!-- বাটনগুলো এখানে আসবে -->
+    <div id="links-container" class="pt-5 pb-32">
+        <!-- অটোমেটিক লিঙ্ক লোড হবে -->
     </div>
 
-    <!-- অ্যাডমিন লগইন বাটন -->
+    <!-- লগইন বাটন (লুকানো) -->
     <div class="text-center py-10">
-        <button onclick="openLogin()" class="text-gray-300 text-[10px] font-bold uppercase tracking-widest hover:text-blue-500">🔒 Secure Admin Access</button>
+        <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="text-gray-300 text-[10px]">🔒 ADMIN LOGIN</button>
     </div>
 </div>
 
-<!-- লগইন পপআপ -->
-<div id="login-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[200] p-6">
+<!-- লগইন বক্স -->
+<div id="login-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[200] p-6">
     <div class="bg-white p-8 rounded-3xl w-full max-w-xs text-center shadow-2xl">
-        <h3 class="font-bold text-gray-800 mb-6 text-lg border-b pb-2">অ্যাডমিন লগইন</h3>
-        <input type="text" id="admin-user" placeholder="ইউজার নেম" class="w-full border p-3 rounded-xl mb-3 outline-none focus:ring-2 ring-blue-500 bg-gray-50">
-        <input type="password" id="admin-pass" placeholder="পাসওয়ার্ড" class="w-full border p-3 rounded-xl mb-6 outline-none focus:ring-2 ring-blue-500 bg-gray-50">
-        <button onclick="attemptLogin()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-bold shadow-lg active:scale-95 transition">লগইন</button>
-        <button onclick="closeLogin()" class="mt-4 text-gray-400 text-xs hover:underline">বাতিল করুন</button>
+        <h3 class="font-bold text-gray-800 mb-6 text-lg">অ্যাডমিন এক্সেস</h3>
+        <input type="text" id="u-name" placeholder="ইউজার নেম" class="w-full border p-3 rounded-xl mb-3 outline-none focus:ring-2 ring-blue-500 bg-gray-50">
+        <input type="password" id="u-pass" placeholder="পাসওয়ার্ড" class="w-full border p-3 rounded-xl mb-6 outline-none focus:ring-2 ring-blue-500 bg-gray-50">
+        <button onclick="handleLogin()" class="w-full bg-blue-700 text-white p-3 rounded-xl font-bold shadow-lg">লগইন</button>
+        <button onclick="document.getElementById('login-modal').classList.add('hidden')" class="mt-4 text-gray-400 text-xs">বন্ধ করুন</button>
     </div>
 </div>
 
-<!-- অ্যাডমিন কন্ট্রোল প্যানেল (লগইন হলে নিচে আসবে) -->
+<!-- কন্ট্রোল প্যানেল -->
 <div id="admin-panel" class="admin-panel">
-    <h3 class="font-bold text-blue-600 mb-5 flex items-center justify-center"><i class="fas fa-tools mr-2"></i> অ্যাডমিন সেটিংস</h3>
-    
-    <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">নতুন ফিচার যোগ করুন:</label>
-    <input type="text" id="new-name" placeholder="ফিচারের নাম (যেমন: ফেসবুক)" class="w-full border p-3 rounded-xl mb-3 mt-1 bg-gray-50 outline-none">
-    
-    <input type="text" id="new-url" placeholder="লিঙ্ক (যেমন: facebook.com)" class="w-full border p-3 rounded-xl mb-5 bg-gray-50 outline-none">
-    
-    <button onclick="addNewFeature()" class="w-full bg-green-600 text-white p-3 rounded-xl font-bold shadow-lg hover:bg-green-700 transition">সেভ করুন</button>
-    
-    <button onclick="logout()" class="w-full text-red-400 text-[10px] mt-6 font-bold uppercase tracking-tighter">লগআউট এবং বন্ধ করুন</button>
+    <h3 class="font-bold text-blue-700 mb-4 text-center">নতুন বাটন যোগ করুন</h3>
+    <input type="text" id="btn-name" placeholder="বাটনের নাম (যেমন: ফেসবুক)" class="w-full border p-3 rounded-xl mb-3 bg-gray-50 outline-none">
+    <input type="text" id="btn-url" placeholder="লিঙ্ক (যেমন: facebook.com)" class="w-full border p-3 rounded-xl mb-4 bg-gray-50 outline-none">
+    <button onclick="saveNewLink()" class="w-full bg-green-600 text-white p-3 rounded-xl font-bold shadow-lg">সেভ করুন</button>
+    <button onclick="sessionStorage.clear(); location.reload();" class="w-full text-red-500 text-xs mt-5">লগআউট</button>
 </div>
 
 <script>
-    // ডাটা স্টোরেজ চেক
-    let monchoData = JSON.parse(localStorage.getItem('monchoDB')) || {
-        links: [
-            { name: "প্রবাসী মঞ্চ ফাউন্ডেশন ওয়েবসাইট", url: "https://nsbangla.com" }
-        ]
+    // ডাটাবেজ সিমুলেশন (ব্রাউজার মেমোরি)
+    let appData = JSON.parse(localStorage.getItem('moncho_db')) || {
+        links: [{ name: "অফিসিয়াল ফেসবুক পেজ", url: "https://facebook.com" }]
     };
 
-    // অ্যাপ রেন্ডার করা
-    function renderApp() {
-        const container = document.getElementById('links-display');
+    function render() {
+        const container = document.getElementById('links-container');
         container.innerHTML = "";
-
-        monchoData.links.forEach((item, index) => {
+        appData.links.forEach((item, index) => {
             container.innerHTML += `
-                <div class="relative group">
+                <div class="relative px-4">
                     <a href="${item.url}" target="_blank" class="link-btn">
-                        <i class="fas fa-external-link-alt mr-4 text-blue-500 text-xl"></i>
+                        <i class="fas fa-external-link-alt mr-4 text-blue-600"></i>
                         <span>${item.name}</span>
                     </a>
-                    <button onclick="deleteLink(${index})" class="adm-only hidden absolute right-3 top-4 text-red-300 hover:text-red-600">
+                    <button onclick="delLink(${index})" class="adm-only hidden absolute right-8 top-6 text-red-400">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             `;
         });
 
-        if(sessionStorage.getItem('isLoggedIn') === 'true') {
+        if(sessionStorage.getItem('isAuth') === 'true') {
             document.getElementById('admin-panel').style.display = "block";
-            document.querySelectorAll('.adm-only').forEach(btn => btn.classList.remove('hidden'));
+            document.querySelectorAll('.adm-only').forEach(b => b.classList.remove('hidden'));
         }
     }
 
-    // লগইন ফাংশন
-    function openLogin() { document.getElementById('login-modal').classList.remove('hidden'); }
-    function closeLogin() { document.getElementById('login-modal').classList.add('hidden'); }
-
-    function attemptLogin() {
-        const user = document.getElementById('admin-user').value;
-        const pass = document.getElementById('admin-pass').value;
-
-        if(user === "MDRAFIK159123" && pass === "159123") {
-            sessionStorage.setItem('isLoggedIn', 'true');
-            alert("সফলভাবে লগইন হয়েছে!");
+    function handleLogin() {
+        const u = document.getElementById('u-name').value;
+        const p = document.getElementById('u-pass').value;
+        if(u === "MDRAFIK159123" && p === "159123") {
+            sessionStorage.setItem('isAuth', 'true');
             location.reload();
-        } else {
-            alert("ভুল ইউজার নেম অথবা পাসওয়ার্ড!");
-        }
+        } else { alert("ভুল ইউজার নেম বা পাসওয়ার্ড!"); }
     }
 
-    // ডাটা সেভ করা
-    function addNewFeature() {
-        const name = document.getElementById('new-name').value;
-        let url = document.getElementById('new-url').value;
-
+    function saveNewLink() {
+        const name = document.getElementById('btn-name').value;
+        let url = document.getElementById('btn-url').value;
         if(name && url) {
-            if (!url.startsWith('http')) url = 'https://' + url;
-            monchoData.links.push({ name, url });
-            localStorage.setItem('monchoDB', JSON.stringify(monchoData));
-            alert("সেভ হয়েছে!");
+            if(!url.startsWith('http')) url = 'https://' + url;
+            appData.links.push({ name, url });
+            localStorage.setItem('moncho_db', JSON.stringify(appData));
+            alert("সফলভাবে সেভ হয়েছে!");
             location.reload();
-        } else {
-            alert("নাম এবং লিঙ্ক—উভয়ই দিন।");
         }
     }
 
-    function deleteLink(index) {
+    function delLink(i) {
         if(confirm("ডিলিট করতে চান?")) {
-            monchoData.links.splice(index, 1);
-            localStorage.setItem('monchoDB', JSON.stringify(monchoData));
-            renderApp();
+            appData.links.splice(i, 1);
+            localStorage.setItem('moncho_db', JSON.stringify(appData));
+            render();
         }
     }
 
-    function logout() {
-        sessionStorage.clear();
-        location.reload();
-    }
-
-    // অ্যাপ চালু
-    renderApp();
+    render();
 </script>
 
 </body>
