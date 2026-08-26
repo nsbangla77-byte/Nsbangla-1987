@@ -16,7 +16,129 @@
 
 <div class="app-card">
     <div class="text-center mb-8 pt-4">
+        <div class="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-4 flex items-cent<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>আমার ডায়নামিক অ্যাপ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f0f2f5; font-family: sans-serif; }
+        .app-card { max-width: 450px; margin: auto; background: white; min-height: 100vh; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .link-btn { display: flex; align-items: center; background: #ffffff; border: 1px solid #e2e8f0; padding: 15px; margin-bottom: 12px; border-radius: 12px; text-decoration: none; color: #1e293b; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.3s; }
+        .link-btn:hover { background: #3b82f6; color: white; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <!-- প্রোফাইল অংশ -->
+    <div class="text-center mb-8 pt-4">
         <div class="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl shadow-lg">
+            <i class="fas fa-rocket"></i>
+        </div>
+        <h1 id="app-title-display" class="text-2xl font-bold text-gray-800">আমার অফিসিয়াল অ্যাপ</h1>
+        <p class="text-gray-500 text-sm">সব গুরুত্বপূর্ণ লিঙ্ক এখানে পাবেন</p>
+    </div>
+
+    <!-- লিঙ্ক লিস্ট -->
+    <div id="links-container">
+        <!-- ডাটা এখানে আসবে -->
+    </div>
+
+    <!-- অ্যাডমিন লগইন -->
+    <div class="mt-20 text-center">
+        <button onclick="toggleLogin()" class="text-gray-400 text-xs">অ্যাডমিন লগইন</button>
+        <div id="login-box" class="hidden mt-4 p-4 bg-white border rounded shadow-lg">
+            <input type="password" id="pin-input" placeholder="পিন কোড: 1234" class="w-full p-2 border rounded mb-2 text-center">
+            <button onclick="loginAdmin()" class="bg-blue-600 text-white px-6 py-2 rounded-lg w-full font-bold">লগইন</button>
+        </div>
+    </div>
+
+    <!-- অ্যাডমিন প্যানেল -->
+    <div id="admin-panel" class="hidden bg-blue-50 p-4 rounded-xl mt-10 border-2 border-blue-400">
+        <h3 class="font-bold text-blue-700 mb-4 text-center">অ্যাডমিন কন্ট্রোল প্যানেল</h3>
+        <input type="text" id="new-name" class="w-full p-2 mb-2 border rounded" placeholder="ফিচারের নাম">
+        <input type="text" id="new-url" class="w-full p-2 mb-2 border rounded" placeholder="লিঙ্ক (https://...)">
+        <button onclick="addNewLink()" class="bg-green-600 text-white p-3 w-full rounded-lg font-bold">নতুন ফিচার যোগ করুন</button>
+        <button onclick="resetData()" class="mt-4 text-red-500 text-xs w-full">সব রিসেট করুন</button>
+    </div>
+</div>
+
+<script>
+    // ডিফল্ট লিঙ্কসমূহ (নতুন ডিভাইসে এগুলো দেখাবে)
+    const defaultData = [
+        { name: "আমাদের ওয়েবসাইট", url: "https://google.com" },
+        { name: "ফেসবুক গ্রুপ", url: "https://facebook.com" },
+        { name: "টেলিগ্রাম চ্যানেল", url: "https://telegram.org" }
+    ];
+
+    // ডাটা লোড করা
+    let myLinks = JSON.parse(localStorage.getItem('appLinks')) || defaultData;
+
+    function render() {
+        const container = document.getElementById('links-container');
+        container.innerHTML = "";
+        myLinks.forEach((item, index) => {
+            container.innerHTML += `
+                <div class="relative">
+                    <a href="${item.url}" target="_blank" class="link-btn">
+                        <i class="fas fa-external-link-alt w-8 text-blue-600"></i>
+                        <span>${item.name}</span>
+                    </a>
+                    <button onclick="deleteLink(${index})" class="admin-only hidden absolute right-2 top-4 text-red-400">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>`;
+        });
+        
+        if(sessionStorage.getItem('isAdmin') === 'true') {
+            document.getElementById('admin-panel').classList.remove('hidden');
+            document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
+        }
+    }
+
+    function toggleLogin() { document.getElementById('login-box').classList.toggle('hidden'); }
+
+    function loginAdmin() {
+        if(document.getElementById('pin-input').value === "1234") {
+            sessionStorage.setItem('isAdmin', 'true');
+            alert("লগইন সফল!");
+            location.reload();
+        } else { alert("ভুল পিন!"); }
+    }
+
+    function addNewLink() {
+        const name = document.getElementById('new-name').value;
+        const url = document.getElementById('new-url').value;
+        if(name && url) {
+            myLinks.push({ name, url });
+            localStorage.setItem('appLinks', JSON.stringify(myLinks));
+            location.reload();
+        }
+    }
+
+    function deleteLink(index) {
+        if(confirm("ডিলিট করতে চান?")) {
+            myLinks.splice(index, 1);
+            localStorage.setItem('appLinks', JSON.stringify(myLinks));
+            render();
+        }
+    }
+
+    function resetData() {
+        if(confirm("সব ডাটা মুছে ডিফল্ট সেটিংসে ফিরবেন?")) {
+            localStorage.removeItem('appLinks');
+            location.reload();
+        }
+    }
+
+    render();
+</script>
+</body>
+</html>er justify-center text-white text-3xl shadow-lg">
             <i class="fas fa-rocket"></i>
         </div>
         <h1 id="display-app-name" class="text-2xl font-bold text-gray-800">আমার অফিসিয়াল অ্যাপ</h1>
