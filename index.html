@@ -3,61 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Probashi Moncho Foundation</title>
+    <title>Probashi Moncho App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #f3f4f6; }
-        .link-card { display: flex; align-items: center; background: #fff; border: 1px solid #e5e7eb; padding: 16px; margin-bottom: 12px; border-radius: 16px; text-decoration: none; color: #1f2937; font-weight: 600; }
-    </style>
 </head>
-<body>
+<body class="bg-gray-100">
 
 <div class="max-w-md mx-auto bg-white min-h-screen shadow-lg pb-10">
-    <!-- Header -->
     <div class="bg-blue-600 p-10 text-center text-white rounded-b-[40px] shadow-lg mb-8">
         <div class="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center text-blue-600 text-3xl">
             <i class="fas fa-user-shield"></i>
         </div>
-        <h1 id="main-title" class="text-xl font-bold uppercase">BANGLADESH PROBASHI MONCHO FOUNDATION</h1>
-        <p class="text-blue-100 text-sm">আপনার সকল গুরুত্বপূর্ণ লিঙ্ক এখানে</p>
+        <h1 id="main-title" class="text-xl font-bold uppercase">প্রবাসী মঞ্চ ফাউন্ডেশন</h1>
     </div>
 
-    <!-- লিঙ্ক লিস্ট -->
-    <div id="links-container" class="px-5">
-        <!-- বাটন এখানে আসবে -->
-    </div>
+    <div id="links-container" class="px-5"></div>
 
-    <!-- লগইন বাটন -->
     <div class="text-center py-20">
-        <button onclick="toggleLoginBox()" class="text-gray-400 text-xs">🔒 অ্যাডমিন এক্সেস</button>
+        <button onclick="document.getElementById('login-box').classList.remove('hidden')" class="text-gray-400 text-xs">🔒 অ্যাডমিন এক্সেস</button>
     </div>
 </div>
 
 <!-- লগইন বক্স -->
 <div id="login-box" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-6">
-    <div class="bg-white p-6 rounded-2xl w-full max-w-xs text-center shadow-2xl">
-        <h3 class="font-bold mb-4">অ্যাডমিন লগইন</h3>
-        <input type="text" id="u-name" placeholder="ইউজার নেম" class="w-full border p-2 mb-2 rounded-lg outline-none">
-        <input type="password" id="u-pass" placeholder="পাসওয়ার্ড" class="w-full border p-2 mb-4 rounded-lg outline-none">
+    <div class="bg-white p-6 rounded-2xl w-full max-w-xs text-center">
+        <input type="text" id="u-name" placeholder="ইউজার নেম" class="w-full border p-2 mb-2 rounded-lg">
+        <input type="password" id="u-pass" placeholder="পাসওয়ার্ড" class="w-full border p-2 mb-4 rounded-lg">
         <button onclick="checkLogin()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-bold">লগইন</button>
-        <button onclick="toggleLoginBox()" class="mt-2 text-gray-400 text-xs">বন্ধ করুন</button>
     </div>
 </div>
 
 <!-- অ্যাডমিন প্যানেল -->
 <div id="admin-panel" class="hidden fixed bottom-0 inset-x-0 bg-white p-6 rounded-t-3xl shadow-2xl border-t-4 border-blue-500 max-w-md mx-auto">
-    <h3 class="font-bold text-blue-600 mb-4">অ্যাডমিন সেটিংস</h3>
-    <input type="text" id="set-title" placeholder="অ্যাপের নাম" class="w-full border p-2 mb-2 rounded-lg">
-    <input type="text" id="feat-name" placeholder="ফিচারের নাম" class="w-full border p-2 mb-2 rounded-lg">
-    <input type="text" id="feat-url" placeholder="লিঙ্ক (https://...)" class="w-full border p-2 mb-4 rounded-lg">
+    <input type="text" id="set-title" placeholder="অ্যাপের নাম বদলান" class="w-full border p-2 mb-2 rounded-lg">
+    <input type="text" id="feat-name" placeholder="ফিচারের নাম (যেমন: ফেসবুক)" class="w-full border p-2 mb-2 rounded-lg">
+    <input type="text" id="feat-url" placeholder="লিঙ্ক (যেমন: facebook.com)" class="w-full border p-2 mb-4 rounded-lg">
     <button onclick="saveData()" class="w-full bg-green-600 text-white p-3 rounded-xl font-bold">সেভ করুন</button>
-    <button onclick="sessionStorage.clear(); location.reload();" class="mt-4 text-red-500 text-xs w-full">লগআউট</button>
+    <button onclick="sessionStorage.clear(); location.reload();" class="mt-4 text-red-500 text-xs w-full text-center">লগআউট</button>
 </div>
 
 <script>
     let myAppData = JSON.parse(localStorage.getItem('monchoData')) || {
-        title: "BANGLADESH PROBASHI MONCHO FOUNDATION",
+        title: "প্রবাসী মঞ্চ ফাউন্ডেশন",
         links: []
     };
 
@@ -66,16 +53,12 @@
         const container = document.getElementById('links-container');
         container.innerHTML = "";
         myAppData.links.forEach((link, index) => {
-            container.innerHTML += `
-                <div class="relative">
-                    <a href="${link.url}" target="_blank" class="link-card">
-                        <i class="fas fa-external-link-alt mr-3 text-blue-600"></i>
-                        <span>${link.name}</span>
-                    </a>
-                    <button onclick="deleteLink(${index})" class="adm-btn hidden absolute right-2 top-4 text-red-400">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>`;
+            container.innerHTML += `<div class="relative">
+                <a href="${link.url}" target="_blank" class="flex items-center bg-white border p-4 mb-3 rounded-xl shadow-sm font-bold text-gray-700">
+                    <i class="fas fa-external-link-alt mr-3 text-blue-600"></i> ${link.name}
+                </a>
+                <button onclick="deleteLink(${index})" class="adm-btn hidden absolute right-2 top-4 text-red-400"><i class="fas fa-trash"></i></button>
+            </div>`;
         });
         if(sessionStorage.getItem('isLoggedIn') === 'true') {
             document.getElementById('admin-panel').classList.remove('hidden');
@@ -83,14 +66,8 @@
         }
     }
 
-    function toggleLoginBox() { 
-        document.getElementById('login-box').classList.toggle('hidden'); 
-    }
-
     function checkLogin() {
-        const user = document.getElementById('u-name').value;
-        const pass = document.getElementById('u-pass').value;
-        if(user === "MDRAFIK159123" && pass === "159123") {
+        if(document.getElementById('u-name').value === "MDRAFIK159123" && document.getElementById('u-pass').value === "159123") {
             sessionStorage.setItem('isLoggedIn', 'true');
             location.reload();
         } else { alert("ভুল তথ্য!"); }
@@ -99,11 +76,18 @@
     function saveData() {
         const t = document.getElementById('set-title').value;
         const n = document.getElementById('feat-name').value;
-        const u = document.getElementById('feat-url').value;
+        let u = document.getElementById('feat-url').value;
+
         if(t) myAppData.title = t;
-        if(n && u) myAppData.links.push({ name: n, url: u });
-        localStorage.setItem('monchoData', JSON.stringify(myAppData));
-        location.reload();
+        if(n && u) {
+            if (!u.startsWith('http')) u = 'https://' + u;
+            myAppData.links.push({ name: n, url: u });
+            localStorage.setItem('monchoData', JSON.stringify(myAppData));
+            alert("সেভ হয়েছে!");
+            location.reload();
+        } else if(!n || !u) {
+            alert("ফিচারের নাম এবং লিঙ্ক দিন।");
+        }
     }
 
     function deleteLink(i) {
