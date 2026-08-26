@@ -1,1 +1,111 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>আমার অ্যাপ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f0f2f5; font-family: sans-serif; }
+        .app-card { max-width: 450px; margin: auto; background: white; min-height: 100vh; padding: 20px; }
+        .link-btn { display: flex; align-items: center; background: #ffffff; border: 1px solid #ddd; padding: 15px; margin-bottom: 12px; border-radius: 12px; text-decoration: none; color: #333; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
 
+<div class="app-card">
+    <div class="text-center mb-8 pt-4">
+        <div class="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl shadow-lg">
+            <i class="fas fa-rocket"></i>
+        </div>
+        <h1 id="display-app-name" class="text-2xl font-bold text-gray-800">আমার অফিসিয়াল অ্যাপ</h1>
+        <p class="text-gray-500 text-sm">ফিউচার এবং গুরুত্বপূর্ণ লিঙ্কসমূহ</p>
+    </div>
+
+    <!-- লিঙ্ক লিস্ট -->
+    <div id="links-container">
+        <p class="text-center text-gray-400">অ্যাডমিন প্যানেল থেকে লিঙ্ক যোগ করুন...</p>
+    </div>
+
+    <div class="mt-20 text-center">
+        <button onclick="showLogin()" class="text-gray-400 text-xs">অ্যাডমিন প্যানেল লগইন</button>
+        <div id="login-box" class="hidden mt-4 p-4 bg-white border rounded shadow">
+            <input type="password" id="pass-input" placeholder="পিন: 1234" class="w-full p-2 border rounded mb-2 text-center">
+            <button onclick="login()" class="bg-blue-600 text-white px-6 py-2 rounded-lg w-full">লগইন</button>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="hidden bg-gray-100 p-4 rounded-lg mt-10 border-2 border-blue-500">
+        <h3 class="font-bold mb-4">অ্যাডমিন কন্ট্রোল</h3>
+        <input type="text" id="name-input" class="w-full p-2 mb-2 border rounded" placeholder="নাম">
+        <input type="text" id="url-input" class="w-full p-2 mb-2 border rounded" placeholder="লিঙ্ক">
+        <button onclick="addItem()" class="bg-green-600 text-white p-3 w-full rounded-lg font-bold">সেভ করুন</button>
+        <button onclick="clearAll()" class="mt-4 text-red-500 text-xs underline">সব ডিলিট করুন (Reset)</button>
+    </div>
+</div>
+
+<script>
+    let myData = JSON.parse(localStorage.getItem('appData')) || [];
+
+    function renderApp() {
+        const container = document.getElementById('links-container');
+        if (myData.length === 0) {
+            container.innerHTML = '<p class="text-center text-gray-400">কোন লিঙ্ক নেই। লগইন করে যোগ করুন।</p>';
+        } else {
+            container.innerHTML = "";
+            myData.forEach((item, index) => {
+                container.innerHTML += `
+                    <div class="relative">
+                        <a href="${item.url}" target="_blank" class="link-btn">
+                            <i class="fas fa-link w-8 text-blue-600 text-xl"></i>
+                            <span>${item.name}</span>
+                        </a>
+                        <button onclick="deleteItem(${index})" class="admin-only hidden absolute right-2 top-3 text-red-500">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>`;
+            });
+        }
+        if(sessionStorage.getItem('isAdmin') === 'true') {
+            document.getElementById('admin-panel').classList.remove('hidden');
+            document.querySelectorAll('.admin-only').forEach(b => b.classList.remove('hidden'));
+        }
+    }
+
+    function showLogin() { document.getElementById('login-box').classList.toggle('hidden'); }
+
+    function login() {
+        if(document.getElementById('pass-input').value === "1234") {
+            sessionStorage.setItem('isAdmin', 'true');
+            location.reload();
+        } else { alert("ভুল পাসওয়ার্ড!"); }
+    }
+
+    function addItem() {
+        const name = document.getElementById('name-input').value;
+        const url = document.getElementById('url-input').value;
+        if(name && url) {
+            myData.push({ name, url });
+            localStorage.setItem('appData', JSON.stringify(myData));
+            location.reload();
+        }
+    }
+
+    function deleteItem(index) {
+        myData.splice(index, 1);
+        localStorage.setItem('appData', JSON.stringify(myData));
+        renderApp();
+    }
+
+    function clearAll() {
+        if(confirm("সব ডাটা মুছে ফেলবেন?")) {
+            localStorage.removeItem('appData');
+            location.reload();
+        }
+    }
+
+    renderApp();
+</script>
+</body>
+</html>
