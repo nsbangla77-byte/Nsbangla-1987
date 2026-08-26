@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>প্রিমিয়াম ডায়নামিক অ্যাপ</title>
+    
+    <!-- FontAwesome & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .app-card { max-width: 450px; margin: auto; background: white; min-height: 100vh; padding: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .link-btn { transition: 0.3s; display: flex; align-items: center; background: #ffffff; border: 1px solid #ddd; padding: 12px; margin-bottom: 10px; border-radius: 12px; text-decoration: none; color: #333; font-weight: 600; }
+        .link-btn:hover { background: #007bff; color: white; transform: translateY(-2px); }
+        .admin-box { display: none; background: #e9ecef; padding: 15px; border-radius: 10px; margin-top: 20px; border: 2px dashed #007bff; }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <!-- Header -->
+    <div class="text-center mb-6">
+        <div class="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-3xl">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <h1 id="app-name" class="text-2xl font-bold text-gray-800">লোড হচ্ছে...</h1>
+        <p class="text-gray-500 text-sm">সরাসরি অ্যাডমিন প্যানেল থেকে নিয়ন্ত্রিত</p>
+    </div>
+
+    <!-- User Links View -->
+    <div id="links-display">
+        <!-- লিঙ্কগুলো এখানে রিয়েল-টাইমে আসবে -->
+    </div>
+
+    <hr class="my-6">
+
+    <!-- Admin Section Login -->
+    <div id="admin-login-sec" class="text-center">
+        <button onclick="toggleAdminLogin()" class="text-xs text-gray-400">অ্যাডমিন লগইন</button>
+        <div id="login-form" class="hidden mt-3 p-4 bg-white shadow rounded">
+            <input type="password" id="admin-pass" placeholder="সিক্রেট পিন দিন" class="border p-2 w-full mb-2">
+            <button onclick="checkAdmin()" class="bg-blue-600 text-white px-4 py-2 rounded w-full">লগইন</button>
+        </div>
+    </div>
+
+    <!-- Admin Control Panel -->
+    <div id="admin-panel" class="admin-box">
+        <h3 class="font-bold mb-3 text-blue-700"><i class="fas fa-edit"></i> অ্যাডমিন কন্ট্রোল</h3>
+        
+        <input type="text" id="new-name" placeholder="ফিচারের নাম" class="w-full p-2 mb-2 border rounded">
+        <input type="text" id="new-url" placeholder="লিঙ্ক (https://...)" class="w-full p-2 mb-2 border rounded">
+        <input type="text" id="new-icon" placeholder="FontAwesome আইকন (যেমন: fab fa-facebook)" class="w-full p-2 mb-2 border rounded">
+        
+        <button onclick="addNewLink()" class="bg-green-600 text-white p-2 w-full rounded mb-2">নতুন ফিচার যোগ করুন</button>
+        <button onclick="logoutAdmin()" class="bg-red-500 text-white p-1 w-full rounded text-sm">লগআউট</button>
+    </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // ১. আপনার Firebase কনফিগ এখানে বসান
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        databaseURL: "https://your-project-id.firebaseio.com",
+        projectId: "313360278986",
+        storageBucket: "your-project-id.appspot.com",
+        appId: "your-app-id"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const linksRef = ref(db, 'links');
+
+    // ডাটা লোড করা
+    onValue(linksRef, (snapshot) => {
+        const data = snapshot.val();
+        const container = document.getElementById('links-display');
+        container.innerHTML = "";
+        document.getElementById('app-name').innerText = "আমার অফিসিয়াল অ্যাপ";
+
+        for (let id in data) {
+            const item = data[id];
+            container.innerHTML += `
+                <div class="relative group">
+                    <a href="${item.url}" target="_blank" class="link-btn">
+                        <i class="${item.icon} w-8 text-blue-600 text-xl"></i>
+                        <span>${item.name}</span>
+                    </a>
+                    <button onclick="deleteLink('${id}')" class="admin-only hidden absolute right-2 top-3 text-red-500">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+        }
+        checkAdminStatus(); // অ্যাডমিন মুড চেক
+    });
+
+    // নতুন লিঙ্ক যোগ করা
+    window.addNewLink = function() {
+        const name = document.getElementById('new-name').value;
+        const url = document.getElementById('new-url').value;
+        const icon = document.getElementById('new-icon').value;
+
+        if(name && url) {
+            push(linksRef, { name, url, icon });
+            alert("সফলভাবে যোগ হয়েছে!");
+        }
+    };
+
+    // লিঙ্ক ডিলিট করা
+    window.deleteLink = function(id) {
+        if(confirm("এটি ডিলিট করতে চান?")) {
+            remove(ref(db, 'links/' + id));
+        }
+    };
+
+</script>
+
+<script>
+    function toggleAdminLogin() {
+        document.getElementById('login-form').classList.toggle('hidden');
+    }
+
+    function checkAdmin() {
+        const pass = document.getElementById('admin-pass').value;
+        if(pass === "1234") { // আপনার পছন্দের পাসওয়ার্ড দিন
+            localStorage.setItem("isAdmin", "true");
+            location.reload();
+        } else {
+            alert("ভুল পিন!");
+        }
+    }
+
+    function checkAdminStatus() {
+        if(localStorage.getItem("isAdmin") === "true") {
+            document.getElementById('admin-panel').style.display = "block";
+            const delBtns = document.querySelectorAll('.admin-only');
+            delBtns.forEach(btn => btn.classList.remove('hidden'));
+        }
+    }
+
+    function logoutAdmin() {
+        localStorage.removeItem("isAdmin");
+        location.reload();
+    }
+</script>
+
+</body>
+</html>
