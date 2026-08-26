@@ -1,24 +1,137 @@
-function saveData() {
-        const t = document.getElementById('set-title').value;
-        const n = document.getElementById('feat-name').value;
-        let u = document.getElementById('feat-url').value;
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probashi Moncho Official</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f0f2f5; font-family: sans-serif; }
+        .app-card { max-width: 480px; margin: auto; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        .link-btn { display: flex; align-items: center; background: #fff; border: 1px solid #e2e8f0; padding: 16px; margin-bottom: 12px; border-radius: 16px; text-decoration: none; color: #334155; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: 0.3s; }
+        .link-btn:hover { border-color: #2563eb; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
 
-        if(t) {
-            myAppData.title = t;
-            localStorage.setItem('monchoData', JSON.stringify(myAppData));
-        }
+<div class="app-card">
+    <!-- Header -->
+    <div class="bg-blue-600 p-10 text-center text-white rounded-b-[40px] shadow-lg mb-8">
+        <div class="w-20 h-20 bg-white rounded-full mx-auto mb-4 flex items-center justify-center text-blue-600 text-3xl shadow-inner">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <h1 id="main-title" class="text-xl font-bold uppercase">প্রবাসী মঞ্চ ফাউন্ডেশন</h1>
+        <p class="text-blue-100 text-xs">BANGLADESH PROBASHI MONCHO FOUNDATION</p>
+    </div>
 
-        if(n && u) {
-            if (!u.startsWith('http')) u = 'https://' + u;
-            // নতুন লিঙ্ক যোগ করা
-            myAppData.links.push({ name: n, url: u });
-            localStorage.setItem('monchoData', JSON.stringify(myAppData));
-            alert("সফলভাবে সেভ হয়েছে!");
-            location.reload();
-        } else if (n || u) {
-            alert("নাম এবং লিঙ্ক—উভয়ই দিতে হবে।");
-        } else if (t) {
-            alert("নাম আপডেট হয়েছে!");
-            location.reload();
+    <!-- লিঙ্ক লিস্ট (সবার ফোনে আপডেট হবে) -->
+    <div id="links-container" class="px-5 pb-20">
+        <p class="text-center text-gray-400 animate-pulse">ডাটা লোড হচ্ছে...</p>
+    </div>
+
+    <!-- লগইন বাটন -->
+    <div class="text-center py-10">
+        <button onclick="document.getElementById('login-modal').classList.remove('hidden')" class="text-gray-300 text-xs font-bold uppercase tracking-widest">🔒 Admin Login</button>
+    </div>
+</div>
+
+<!-- লগইন বক্স -->
+<div id="login-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-[100] p-6">
+    <div class="bg-white p-8 rounded-3xl w-full max-w-xs text-center shadow-2xl">
+        <h3 class="font-bold text-gray-800 mb-6 text-xl border-b pb-2">অ্যাডমিন এক্সেস</h3>
+        <input type="text" id="u-name" placeholder="ইউজার নেম" class="w-full border p-3 rounded-xl mb-3 outline-none focus:ring-2 ring-blue-400">
+        <input type="password" id="u-pass" placeholder="পাসওয়ার্ড" class="w-full border p-3 rounded-xl mb-6 outline-none focus:ring-2 ring-blue-400">
+        <button onclick="checkAdmin()" class="w-full bg-blue-600 text-white p-3 rounded-xl font-bold shadow-lg">লগইন করুন</button>
+        <button onclick="document.getElementById('login-modal').classList.add('hidden')" class="mt-4 text-gray-400 text-sm">বাতিল</button>
+    </div>
+</div>
+
+<!-- অ্যাডমিন কন্ট্রোল প্যানেল -->
+<div id="admin-panel" class="hidden fixed bottom-0 inset-x-0 bg-white p-6 rounded-t-[30px] shadow-[0_-10px_30px_rgba(0,0,0,0.1)] border-t-4 border-blue-500 max-w-md mx-auto z-[150]">
+    <h3 class="font-bold text-blue-600 mb-4 flex items-center"><i class="fas fa-edit mr-2"></i> অ্যাডমিন কন্ট্রোল প্যানেল</h3>
+    <input type="text" id="feat-name" placeholder="ফিচারের নাম" class="w-full border p-2 mb-2 rounded-lg">
+    <input type="text" id="feat-url" placeholder="লিঙ্ক (https://...)" class="w-full border p-2 mb-4 rounded-lg">
+    <button onclick="addLink()" class="w-full bg-green-600 text-white p-3 rounded-xl font-bold shadow-lg">নতুন লিঙ্ক যোগ করুন</button>
+    <button onclick="sessionStorage.clear(); location.reload();" class="w-full text-red-500 text-xs mt-4">লগআউট</button>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // *** আপনার Firebase তথ্য এখানে বসাবেন ***
+    const firebaseConfig = {
+        apiKey: "AIzaSy...", 
+        databaseURL: "https://আপনার-প্রজেক্ট-আইডি.firebaseio.com",
+        projectId: "313360278986",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dbRef = ref(db, 'links');
+
+    // ডাটা রিয়েল-টাইম লোড করা (Global Sync)
+    onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        const container = document.getElementById('links-container');
+        container.innerHTML = "";
+        
+        if(!data) {
+            container.innerHTML = '<p class="text-center text-gray-400">কোন লিঙ্ক নেই।</p>';
+        } else {
+            for (let id in data) {
+                container.innerHTML += `
+                    <div class="relative group">
+                        <a href="${data[id].url}" target="_blank" class="link-btn">
+                            <i class="fas fa-link mr-4 text-blue-600"></i>
+                            <span>${data[id].name}</span>
+                        </a>
+                        <button onclick="deleteLink('${id}')" class="adm-only hidden absolute right-3 top-4 text-red-400">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>`;
+            }
         }
+        if(sessionStorage.getItem('isAdm') === 'true') {
+            document.getElementById('admin-panel').classList.remove('hidden');
+            document.querySelectorAll('.adm-only').forEach(el => el.classList.remove('hidden'));
+        }
+    });
+
+    // নতুন লিঙ্ক যোগ করার ফাংশন
+    window.addLink = function() {
+        const name = document.getElementById('feat-name').value;
+        const url = document.getElementById('feat-url').value;
+        if(name && url) {
+            const finalUrl = url.startsWith('http') ? url : 'https://' + url;
+            push(dbRef, { name, url: finalUrl });
+            alert("সফলভাবে সবার জন্য আপডেট হয়েছে!");
+            document.getElementById('feat-name').value = "";
+            document.getElementById('feat-url').value = "";
+        }
+    };
+
+    // ডিলিট করার ফাংশন
+    window.deleteLink = function(id) {
+        if(confirm("এটি সবার ফোন থেকে মুছে যাবে। নিশ্চিত?")) {
+            remove(ref(db, 'links/' + id));
+        }
+    };
+</script>
+
+<script>
+    function checkAdmin() {
+        const u = document.getElementById('u-name').value;
+        const p = document.getElementById('u-pass').value;
+        // আপনার ইউজার ও পাসওয়ার্ড
+        if(u === "MDRAFIK159123" && p === "159123") {
+            sessionStorage.setItem('isAdm', 'true');
+            location.reload();
+        } else { alert("ভুল তথ্য!"); }
     }
+</script>
+
+</body>
+</html>
